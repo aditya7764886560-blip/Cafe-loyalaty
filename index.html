@@ -106,7 +106,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Aapka exact Firebase Config Integrated Hai
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCNdeDRPRD0_Lp79-WumqJCxRV-jQq9uC8",
       authDomain: "abhinav-83619.firebaseapp.com",
@@ -134,7 +134,7 @@
     const deviceToken = getDeviceToken();
     document.getElementById("deviceIdDisplay").innerText = "Device ID: " + deviceToken;
 
-    // Automatic Loyalty Stamp Processor
+    // Automatic Loyalty Stamp Processor (Instant On Every Scan)
     async function processLoyaltyStamp() {
       const urlParams = new URLSearchParams(window.location.search);
       const storeId = urlParams.get("store");
@@ -154,7 +154,7 @@
         const docSnap = await getDoc(customerRef);
 
         if (!docSnap.exists()) {
-          // Naye Customer Ke Liye Record Banayein
+          // New Customer First Scan
           await setDoc(customerRef, {
             stamps: 1,
             lastScanAt: serverTimestamp(),
@@ -165,16 +165,8 @@
         } else {
           const data = docSnap.data();
           let currentStamps = data.stamps || 0;
-          const lastScan = data.lastScanAt ? data.lastScanAt.toDate() : null;
-          const now = new Date();
 
-          // 2-Hour Fraud Protection Lock
-          if (lastScan && (now - lastScan) < (2 * 60 * 60 * 1000)) {
-            updateGridUI(currentStamps);
-            showError("⚠️ Stamp already claimed recently. Try again later!");
-            return;
-          }
-
+          // Direct Stamp Increase (No Cooldown Restriction)
           let newStamps = currentStamps >= 6 ? 1 : currentStamps + 1;
 
           await updateDoc(customerRef, {
@@ -247,4 +239,3 @@
 
 </body>
 </html>
-
