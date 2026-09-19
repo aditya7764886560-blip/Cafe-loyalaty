@@ -1,103 +1,313 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cafe Loyalty Card</title>
+  <title>Host Biryani Cafe - Loyalty & Rewards</title>
+  <!-- Google Font & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
     }
-    body { 
-      background-color: #f4f7f6; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      min-height: 100vh; 
-      padding: 20px; 
+    body {
+      background: #f8f9fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 40px;
     }
-    .card { 
-      background: #ffffff; 
-      border-radius: 20px; 
-      padding: 30px; 
-      width: 100%; 
-      max-width: 380px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-      text-align: center; 
+
+    /* Navbar Header */
+    header {
+      width: 100%;
+      background: #111;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    h1 { 
-      color: #333; 
-      font-size: 24px; 
-      margin-bottom: 5px; 
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff9f43;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    p.subtitle { 
-      color: #666; 
-      font-size: 14px; 
-      margin-bottom: 25px; 
+    .menu-btn {
+      font-size: 22px;
+      cursor: pointer;
+      color: #fff;
     }
-    .stamp-grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 15px; 
-      margin-bottom: 25px; 
+
+    /* Side Modal Menu */
+    .nav-modal {
+      display: none;
+      position: fixed;
+      top: 60px;
+      right: 15px;
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 250px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 101;
     }
-    .stamp-slot { 
-      width: 100%; 
-      aspect-ratio: 1; 
-      border: 2px dashed #ccc; 
-      border-radius: 50%; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      font-size: 20px; 
-      font-weight: bold; 
-      color: #aaa; 
-      background: #fafafa; 
-      position: relative; 
+    .nav-modal h4 {
+      margin-bottom: 12px;
+      color: #ff9f43;
+      font-size: 16px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
     }
-    .stamp-slot.active { 
-      border: 2px solid #ff6b6b; 
-      background: #ffe3e3; 
-      color: #ff6b6b; 
-      animation: pop 0.4s ease-in-out; 
+    .nav-modal p {
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #ddd;
     }
-    .stamp-slot.active::after { 
-      content: '☕'; 
-      font-size: 28px; 
+
+    /* Main Container */
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
     }
-    @keyframes pop { 
-      0% { transform: scale(0.8); } 
-      50% { transform: scale(1.1); } 
-      100% { transform: scale(1); } 
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      margin-bottom: 20px;
     }
-    .status-msg { 
-      background: #e8f5e9; 
-      color: #2e7d32; 
-      padding: 12px; 
-      border-radius: 10px; 
-      font-size: 14px; 
-      font-weight: 600; 
-      margin-top: 15px; 
-      display: none; 
+    .hero h2 {
+      font-size: 26px;
+      color: #222;
+      font-weight: 700;
     }
-    .error-msg { 
-      background: #ffebee; 
-      color: #c62828; 
-      padding: 12px; 
-      border-radius: 10px; 
-      font-size: 14px; 
-      font-weight: 600; 
-      margin-top: 15px; 
-      display: none; 
+    .hero p {
+      font-size: 13px;
+      color: #666;
     }
-    .device-info { 
-      font-size: 11px; 
-      color: #bbb; 
-      margin-top: 20px; 
-      word-break: break-all; 
+
+    /* Loyalty Card Block */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 20px;
+      border: 1px solid #eee;
+    }
+    .card-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stamp-slot {
+      width: 100%;
+      aspect-ratio: 1;
+      border: 2px dashed #ddd;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #aaa;
+      background: #fafafa;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .stamp-slot.active {
+      border: 2px solid #ff9f43;
+      background: #fff8f0;
+      color: #ff9f43;
+      animation: pop 0.4s ease-in-out;
+    }
+    .stamp-slot.active::after {
+      content: '🍲';
+      font-size: 26px;
+    }
+    .stamp-slot.gift-slot.active::after {
+      content: '🎁';
+      font-size: 30px;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .status-msg {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+      margin-top: 10px;
+    }
+    .gift-unlocked-msg {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      display: none;
+      margin-top: 10px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .error-msg {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+      margin-top: 10px;
+    }
+
+    /* Customer Data Form */
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: left;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .input-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .input-group label {
+      font-size: 12px;
+      color: #666;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .save-btn {
+      width: 100%;
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .save-btn:hover {
+      background: #ff9f43;
+    }
+
+    /* Engagement Action Buttons */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .action-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    .action-card:hover {
+      transform: translateY(-3px);
+    }
+    .action-card i {
+      font-size: 26px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .action-card.google i { color: #4285F4; }
+    .action-card.insta i { color: #E1306C; }
+    .action-card span {
+      font-size: 13px;
+      font-weight: 600;
+      display: block;
+    }
+
+    /* Highlights Section */
+    .highlights {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #ffeaa7;
+      color: #d63031;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .device-info {
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 15px;
+      word-break: break-all;
     }
   </style>
 
@@ -106,7 +316,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCNdeDRPRD0_Lp79-WumqJCxRV-jQq9uC8",
       authDomain: "abhinav-83619.firebaseapp.com",
@@ -117,11 +326,9 @@
       measurementId: "G-3NEQCL4ZR6"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Device Token Handler (Local Storage)
     function getDeviceToken() {
       let token = localStorage.getItem("cafe_device_token");
       if (!token) {
@@ -134,17 +341,13 @@
     const deviceToken = getDeviceToken();
     document.getElementById("deviceIdDisplay").innerText = "Device ID: " + deviceToken;
 
-    // Automatic Loyalty Stamp Processor (Instant On Every Scan)
+    // Stamp Logic: 1 to 6 stamps -> 7th scan unlocks 🎁 Gift and resets cycle
     async function processLoyaltyStamp() {
       const urlParams = new URLSearchParams(window.location.search);
       const storeId = urlParams.get("store");
 
-      const statusEl = document.getElementById("statusMsg");
-      const errorEl = document.getElementById("errorMsg");
-
-      // Verify Secret Store Parameter (?store=3636)
       if (storeId !== "3636") {
-        showError("❌ Invalid QR Scan! Only physical store QR works.");
+        showError("❌ Invalid Scan! Scan official Host Biryani Cafe QR Code.");
         return;
       }
 
@@ -154,20 +357,19 @@
         const docSnap = await getDoc(customerRef);
 
         if (!docSnap.exists()) {
-          // New Customer First Scan
           await setDoc(customerRef, {
             stamps: 1,
             lastScanAt: serverTimestamp(),
             createdAt: serverTimestamp()
           });
           updateGridUI(1);
-          showStatus("🎉 Welcome! Your 1st Stamp has been added!");
+          showStatus("🎉 Welcome to Host Biryani Cafe! 1st Stamp Added!");
         } else {
           const data = docSnap.data();
           let currentStamps = data.stamps || 0;
 
-          // Direct Stamp Increase (No Cooldown Restriction)
-          let newStamps = currentStamps >= 6 ? 1 : currentStamps + 1;
+          // Cycle: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 (Gift Unlocked) -> 1
+          let newStamps = currentStamps >= 7 ? 1 : currentStamps + 1;
 
           await updateDoc(customerRef, {
             stamps: newStamps,
@@ -175,28 +377,37 @@
           });
 
           updateGridUI(newStamps);
-          if (newStamps === 6) {
-            showStatus("🎁 Congratulations! You earned a FREE Coffee reward!");
-          } else {
-            showStatus(`🎉 +1 Stamp Added! Total Stamps: ${newStamps}`);
-          }
         }
       } catch (error) {
         console.error("Firebase Error:", error);
-        showError("Unable to connect to database. Try again.");
+        showError("Database connection failed. Please try again.");
       }
     }
 
     function updateGridUI(count) {
+      const giftBox = document.getElementById("giftUnlockedMsg");
+      const statusBox = document.getElementById("statusMsg");
+
       for (let i = 1; i <= 6; i++) {
         const slot = document.getElementById(`slot-${i}`);
-        if (i <= count) {
+        if (i <= count && count < 7) {
+          slot.classList.add("active");
+          slot.innerText = "";
+        } else if (count === 7) {
           slot.classList.add("active");
           slot.innerText = "";
         } else {
           slot.classList.remove("active");
           slot.innerText = i;
         }
+      }
+
+      if (count === 7) {
+        giftBox.style.display = "block";
+        statusBox.style.display = "none";
+      } else {
+        giftBox.style.display = "none";
+        showStatus(`🎉 +1 Stamp Added! Total Stamps: ${count}/6`);
       }
     }
 
@@ -212,30 +423,140 @@
       el.style.display = "block";
     }
 
-    window.addEventListener("DOMContentLoaded", processLoyaltyStamp);
+    window.addEventListener("DOMContentLoaded", () => {
+      processLoyaltyStamp();
+
+      // Auto Fill Local Saved Customer Info
+      const savedName = localStorage.getItem("cust_name") || "";
+      const savedPhone = localStorage.getItem("cust_phone") || "";
+      document.getElementById("custName").value = savedName;
+      document.getElementById("custPhone").value = savedPhone;
+    });
+
+    // Save Customer Form Info
+    window.saveCustomerInfo = async function() {
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+
+      if(!name || !phone) {
+        alert("Please enter both Name and Mobile Number!");
+        return;
+      }
+
+      localStorage.setItem("cust_name", name);
+      localStorage.setItem("cust_phone", phone);
+
+      try {
+        const customerRef = doc(db, "customers", deviceToken);
+        await updateDoc(customerRef, {
+          customerName: name,
+          customerPhone: phone
+        });
+        alert("Details saved successfully! Welcome to Host Biryani Club ✨");
+      } catch(e) {
+        alert("Details saved locally!");
+      }
+    };
   </script>
 </head>
 <body>
 
-  <div class="card">
-    <h1>☕ Cafe Loyalty</h1>
-    <p class="subtitle">Scan QR on every visit to collect stamps!</p>
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand-title">
+      <i class="fa-solid fa-utensils"></i> Host Biryani Cafe
+    </div>
+    <div class="menu-btn" onclick="toggleNavMenu()">
+      <i class="fa-solid fa-bars"></i>
+    </div>
+  </header>
 
-    <!-- 6 Stamp Slots -->
-    <div class="stamp-grid">
-      <div class="stamp-slot" id="slot-1">1</div>
-      <div class="stamp-slot" id="slot-2">2</div>
-      <div class="stamp-slot" id="slot-3">3</div>
-      <div class="stamp-slot" id="slot-4">4</div>
-      <div class="stamp-slot" id="slot-5">5</div>
-      <div class="stamp-slot" id="slot-6">🎁</div>
+  <!-- Side Info Popup -->
+  <div class="nav-modal" id="navModal">
+    <h4><i class="fa-solid fa-clock"></i> Opening Hours</h4>
+    <p>Mon - Sun: 11:00 AM - 10:30 PM</p>
+    <h4><i class="fa-solid fa-wifi"></i> Free Guest WiFi</h4>
+    <p>SSID: HostBiryani_Guest</p>
+    <h4><i class="fa-solid fa-phone"></i> Contact Cafe</h4>
+    <p>+91 98765 43210</p>
+  </div>
+
+  <div class="container">
+
+    <!-- Hero Title -->
+    <div class="hero">
+      <h2>Host Biryani Cafe</h2>
+      <p>Scan QR on every visit & earn free delicious rewards!</p>
     </div>
 
-    <div id="statusMsg" class="status-msg"></div>
-    <div id="errorMsg" class="error-msg"></div>
+    <!-- Stamp Card Section -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-stamp" style="color:#ff9f43;"></i> Loyalty Stamp Card
+      </div>
+
+      <div class="stamp-grid">
+        <div class="stamp-slot" id="slot-1">1</div>
+        <div class="stamp-slot" id="slot-2">2</div>
+        <div class="stamp-slot" id="slot-3">3</div>
+        <div class="stamp-slot" id="slot-4">4</div>
+        <div class="stamp-slot" id="slot-5">5</div>
+        <div class="stamp-slot gift-slot" id="slot-6">6</div>
+      </div>
+
+      <div id="statusMsg" class="status-msg"></div>
+      
+      <!-- 7th Scan Reward Box -->
+      <div id="giftUnlockedMsg" class="gift-unlocked-msg">
+        🎁 CONGRATULATIONS!<br/> You unlocked a FREE Biryani/Special Drink Reward! Show this screen at the counter.
+      </div>
+
+      <div id="errorMsg" class="error-msg"></div>
+    </div>
+
+    <!-- Social Action Buttons -->
+    <div class="action-grid">
+      <a href="https://g.page/r/review" target="_blank" class="action-card google">
+        <i class="fa-brands fa-google"></i>
+        <span>Google Review</span>
+      </a>
+      <a href="https://instagram.com" target="_blank" class="action-card insta">
+        <i class="fa-brands fa-instagram"></i>
+        <span>Follow Instagram</span>
+      </a>
+    </div>
+
+    <!-- Customer Info Section -->
+    <div class="card">
+      <div class="section-title">
+        <i class="fa-solid fa-user-gear" style="color:#ff9f43;"></i> Customer Profile
+      </div>
+      <div class="input-group">
+        <label>Your Name</label>
+        <input type="text" id="custName" placeholder="Enter your full name" />
+      </div>
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="custPhone" placeholder="Enter mobile number" />
+      </div>
+      <button class="save-btn" onclick="saveCustomerInfo()">Save Details</button>
+    </div>
+
+    <!-- Cafe Highlights -->
+    <div class="highlights">
+      <span class="badge">SPECIAL OFFER</span>
+      <h3 style="font-size:16px; margin-bottom:5px;">Authentic Hyderabadi & Dum Biryani</h3>
+      <p style="font-size:12px; color:#666;">Made with premium spices and long-grain basmati rice. Visit daily & claim your loyalty stamps!</p>
+    </div>
 
     <div class="device-info" id="deviceIdDisplay"></div>
   </div>
 
+  <script>
+    function toggleNavMenu() {
+      const modal = document.getElementById("navModal");
+      modal.style.display = (modal.style.display === "block") ? "none" : "block";
+    }
+  </script>
 </body>
 </html>
