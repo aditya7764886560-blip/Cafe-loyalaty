@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cafe Loyalty Card</title>
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    body { 
+      background-color: #f4f7f6; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      padding: 20px; 
+    }
+    .card { 
+      background: #ffffff; 
+      border-radius: 20px; 
+      padding: 30px; 
+      width: 100%; 
+      max-width: 380px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+      text-align: center; 
+    }
+    h1 { 
+      color: #333; 
+      font-size: 24px; 
+      margin-bottom: 5px; 
+    }
+    p.subtitle { 
+      color: #666; 
+      font-size: 14px; 
+      margin-bottom: 25px; 
+    }
+    .stamp-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 15px; 
+      margin-bottom: 25px; 
+    }
+    .stamp-slot { 
+      width: 100%; 
+      aspect-ratio: 1; 
+      border: 2px dashed #ccc; 
+      border-radius: 50%; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      font-size: 20px; 
+      font-weight: bold; 
+      color: #aaa; 
+      background: #fafafa; 
+      position: relative; 
+    }
+    .stamp-slot.active { 
+      border: 2px solid #ff6b6b; 
+      background: #ffe3e3; 
+      color: #ff6b6b; 
+      animation: pop 0.4s ease-in-out; 
+    }
+    .stamp-slot.active::after { 
+      content: '☕'; 
+      font-size: 28px; 
+    }
+    @keyframes pop { 
+      0% { transform: scale(0.8); } 
+      50% { transform: scale(1.1); } 
+      100% { transform: scale(1); } 
+    }
+    .status-msg { 
+      background: #e8f5e9; 
+      color: #2e7d32; 
+      padding: 12px; 
+      border-radius: 10px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      margin-top: 15px; 
+      display: none; 
+    }
+    .error-msg { 
+      background: #ffebee; 
+      color: #c62828; 
+      padding: 12px; 
+      border-radius: 10px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      margin-top: 15px; 
+      display: none; 
+    }
+    .device-info { 
+      font-size: 11px; 
+      color: #bbb; 
+      margin-top: 20px; 
+      word-break: break-all; 
+    }
+  </style>
+
+  <!-- Firebase Modular SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Aapka exact Firebase Config Integrated Hai
+    const firebaseConfig = {
+      apiKey: "AIzaSyCNdeDRPRD0_Lp79-WumqJCxRV-jQq9uC8",
+      authDomain: "abhinav-83619.firebaseapp.com",
+      projectId: "abhinav-83619",
+      storageBucket: "abhinav-83619.firebasestorage.app",
+      messagingSenderId: "548634273546",
+      appId: "1:548634273546:web:a58893f331f87ab4ffcb29",
+      measurementId: "G-3NEQCL4ZR6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Device Token Handler (Local Storage)
+    function getDeviceToken() {
+      let token = localStorage.getItem("cafe_device_token");
+      if (!token) {
+        token = "DEV_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+        localStorage.setItem("cafe_device_token", token);
+      }
+      return token;
+    }
+
+    const deviceToken = getDeviceToken();
+    document.getElementById("deviceIdDisplay").innerText = "Device ID: " + deviceToken;
+
+    // Automatic Loyalty Stamp Processor
+    async function processLoyaltyStamp() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const storeId = urlParams.get("store");
+
+      const statusEl = document.getElementById("statusMsg");
+      const errorEl = document.getElementById("errorMsg");
+
+      // Verify Secret Store Parameter (?store=3636)
+      if (storeId !== "3636") {
+        showError("❌ Invalid QR Scan! Only physical store QR works.");
+        return;
+      }
+
+      const customerRef = doc(db, "customers", deviceToken);
+
+      try {
+        const docSnap = await getDoc(customerRef);
+
+        if (!docSnap.exists()) {
+          // Naye Customer Ke Liye Record Banayein
+          await setDoc(customerRef, {
+            stamps: 1,
+            lastScanAt: serverTimestamp(),
+            createdAt: serverTimestamp()
+          });
+          updateGridUI(1);
+          showStatus("🎉 Welcome! Your 1st Stamp has been added!");
+        } else {
+          const data = docSnap.data();
+          let currentStamps = data.stamps || 0;
+          const lastScan = data.lastScanAt ? data.lastScanAt.toDate() : null;
+          const now = new Date();
+
+          // 2-Hour Fraud Protection Lock
+          if (lastScan && (now - lastScan) < (2 * 60 * 60 * 1000)) {
+            updateGridUI(currentStamps);
+            showError("⚠️ Stamp already claimed recently. Try again later!");
+            return;
+          }
+
+          let newStamps = currentStamps >= 6 ? 1 : currentStamps + 1;
+
+          await updateDoc(customerRef, {
+            stamps: newStamps,
+            lastScanAt: serverTimestamp()
+          });
+
+          updateGridUI(newStamps);
+          if (newStamps === 6) {
+            showStatus("🎁 Congratulations! You earned a FREE Coffee reward!");
+          } else {
+            showStatus(`🎉 +1 Stamp Added! Total Stamps: ${newStamps}`);
+          }
+        }
+      } catch (error) {
+        console.error("Firebase Error:", error);
+        showError("Unable to connect to database. Try again.");
+      }
+    }
+
+    function updateGridUI(count) {
+      for (let i = 1; i <= 6; i++) {
+        const slot = document.getElementById(`slot-${i}`);
+        if (i <= count) {
+          slot.classList.add("active");
+          slot.innerText = "";
+        } else {
+          slot.classList.remove("active");
+          slot.innerText = i;
+        }
+      }
+    }
+
+    function showStatus(msg) {
+      const el = document.getElementById("statusMsg");
+      el.innerText = msg;
+      el.style.display = "block";
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("errorMsg");
+      el.innerText = msg;
+      el.style.display = "block";
+    }
+
+    window.addEventListener("DOMContentLoaded", processLoyaltyStamp);
+  </script>
+</head>
+<body>
+
+  <div class="card">
+    <h1>☕ Cafe Loyalty</h1>
+    <p class="subtitle">Scan QR on every visit to collect stamps!</p>
+
+    <!-- 6 Stamp Slots -->
+    <div class="stamp-grid">
+      <div class="stamp-slot" id="slot-1">1</div>
+      <div class="stamp-slot" id="slot-2">2</div>
+      <div class="stamp-slot" id="slot-3">3</div>
+      <div class="stamp-slot" id="slot-4">4</div>
+      <div class="stamp-slot" id="slot-5">5</div>
+      <div class="stamp-slot" id="slot-6">🎁</div>
+    </div>
+
+    <div id="statusMsg" class="status-msg"></div>
+    <div id="errorMsg" class="error-msg"></div>
+
+    <div class="device-info" id="deviceIdDisplay"></div>
+  </div>
+
+</body>
+</html>
+
